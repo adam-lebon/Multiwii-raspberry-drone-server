@@ -268,14 +268,14 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
 			print "record"
 			global camera
 			if information["record"] == False:
-				if lens(information.usb) == 1:
-					if os.path.isdir(information.usb[0]+'/Video drone') == False:
-						os.mkdir(information.usb[0]+'/Video drone')
+				if len(information["usb"]) == 1:
+					if os.path.isdir(information["usb"][0]+'/Video drone') == False:
+						os.mkdir(information["usb"][0]+'/Video drone')
+					camera.start_recording(information["usb"][0]+"/Video drone/"+time.strftime("%y-%m-%d %H.%M")+".h264")
 					information["record"] = True
-					camera.start_recording('tmp/tmp_'+time.strftime("%Y-%m-%d %H.%M.%S"))
 			else:
-				information["record"] = False
 				camera.stop_recording()
+				information["record"] = False
 
 			self.send_updates()
 
