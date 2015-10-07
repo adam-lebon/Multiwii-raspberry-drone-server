@@ -117,6 +117,7 @@ import os.path
 import uuid
 import threading
 import json
+from shutil import copyfile
 
 from tornado.options import define, options
 
@@ -257,8 +258,8 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
 			if information["main_controller"] == self.id:
 				global board
 				board.rcData = [
-					((message["data"]["right"]["deltaY"]/100)*500+1500),
 					((message["data"]["right"]["deltaX"]/100)*500+1500),
+					((message["data"]["right"]["deltaY"]/100)*500+1500),
 					((message["data"]["left"]["deltaX"]/100)*500+1500),
 					(message["data"]["left"]["deltaY"]/100)*500+1500,
 				]
@@ -268,14 +269,22 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
 			print "record"
 			global camera
 			if information["record"] == False:
-				if len(information["usb"]) == 1:
-					if os.path.isdir(information["usb"][0]+'/Video drone') == False:
-						os.mkdir(information["usb"][0]+'/Video drone')
-					camera.start_recording(information["usb"][0]+"/Video drone/"+time.strftime("%y-%m-%d %H.%M")+".h264")
-					information["record"] = True
+				#if len(information["usb"]) == 1:
+				#if os.path.isdir(information["usb"][0]+'/Video drone') == False:
+				#	os.mkdir(information["usb"][0]+'/Video drone')
+				#camera.start_recording(information["usb"][0]+"/Video drone/"+time.strftime("%y-%m-%d %H.%M")+".h264")
+				camera.start_recording('/home/pi/multiwiiControll/videos/'+time.strftime("%y-%m-%d %H.%M")+".h264")
+				information["current_record_file_name"] = time.strftime("%y-%m-%d %H.%M")
+				information["record"] = True
 			else:
 				camera.stop_recording()
 				information["record"] = False
+				#print('MP4Box -add /home/pi/multiwiiControll/videos/'+information["current_record_file_name"]+'.h264 /home/pi/multiwiiControll/videos/temp/'+information["current_record_file_name"]+'.mp4')
+				#print('encode')
+				#os.system('MP4Box -add /home/pi/multiwiiControll/videos/'+information["current_record_file_name"]+'.h264 /home/pi/multiwiiControll/videos/temp/'+information["current_record_file_name"]+'.mp4')
+				#print('copy')
+				#copyfile('/home/pi/multiwiiControll/videos/temp/'+information["current_record_file_name"]+'.mp4', "/media/usb0/"+information["current_record_file_name"]+".mp4")
+				#print('copy finished')
 
 			self.send_updates()
 
